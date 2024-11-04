@@ -13,7 +13,7 @@ const LoginComponent = ({ onLogin }) => {
 
     try {
       const response = await fetch(
-        "https://197f-84-54-71-79.ngrok-free.app/japan/edu/api/auth/login/web",
+        "http://52.53.242.81:7088/japan/edu/api/auth/login/web",
         {
           method: "POST",
           headers: {
