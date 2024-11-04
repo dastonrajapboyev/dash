@@ -321,7 +321,7 @@ const GroupDashboardComponent = () => {
               className="flex justify-between items-center bg-gray-100 p-4 rounded-md">
               <div>
                 <h4 className="font-bold">{group.name}</h4>
-                <p>Creator ID: {group.creatorId}</p>
+                <p>Creator ID: {group.createdBy}</p>
                 <p>
                   Start Date: {new Date(group.startDate).toLocaleDateString()}
                 </p>

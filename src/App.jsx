@@ -10,22 +10,31 @@ import Dashboard from "./components/Dashbaord"; // Ensure the correct path
 import "./App.css";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  const [token, setToken] = useState(localStorage.getItem("token"));
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setIsAuthenticated(true); // Set authentication state based on token existence
-    }
-  }, []);
+    const handleStorageChange = () => {
+      const storedToken = localStorage.getItem("token");
+      setToken(storedToken);
+    };
 
-  const handleLogin = (token) => {
-    setIsAuthenticated(true); // Set authentication state to true
+    window.addEventListener("storage", handleStorageChange);
+
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+  const handleLogin = () => {
+    setToken(true); // Set authentication state to true
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setIsAuthenticated(false);
+    setToken(false);
   };
 
   return (
@@ -34,10 +43,10 @@ function App() {
         <Route
           path="/"
           element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
+            !token ? (
               <Navigate to="/login" replace />
+            ) : (
+              <Navigate to="/dashboard" replace />
             )
           }
         />
@@ -48,7 +57,7 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            isAuthenticated ? (
+            token ? (
               <Dashboard onLogout={handleLogout} />
             ) : (
               <Navigate to="/login" replace />
