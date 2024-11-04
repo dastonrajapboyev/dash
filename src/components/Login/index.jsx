@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import instance from "../Service";
+
 const LoginComponent = ({ onLogin }) => {
   const [phoneNumber, setPhoneNumber] = useState("+998901234568");
   const [password, setPassword] = useState("12345678");
@@ -12,50 +14,38 @@ const LoginComponent = ({ onLogin }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(
-        "http://52.53.242.81:7088/japan/edu/api/auth/login/web",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "web-request": "true",
-          },
-          body: JSON.stringify({
-            dateBirth: "01/01/1990",
-            deviceId: "myDevice123",
-            fcmToken: "sampleToken",
-            firstName: "John",
-            genderType: "ERKAK",
-            lastName: "Doe",
-            password,
-            phoneNumber,
-            photoId: "photo123",
-            referralCode: "myRefCode",
-            smsCode: 123456,
-            userId: 1,
-          }),
-        }
-      );
+      const response = await instance.post("/auth/login/web", {
+        dateBirth: "01/01/1990",
+        deviceId: "myDevice123",
+        fcmToken: "sampleToken",
+        firstName: "John",
+        genderType: "ERKAK",
+        lastName: "Doe",
+        password,
+        phoneNumber,
+        photoId: "photo123",
+        referralCode: "myRefCode",
+        smsCode: 123456,
+        userId: 1,
+      });
 
-      const data = await response.json();
+      console.log("Response data:", response.data.object.id);
 
-      // Log the entire response data to check the structure
-      console.log("Response data:", data);
-
-      if (response.ok) {
-        // Access the token directly from the data object
-        const token = data.token; // Use data.token directly here
+      if (response.status === 200) {
+        const token = response.data.token;
+        const idUser = response.data.object.id;
         if (token) {
-          localStorage.setItem("token", token); // Store the token
-          console.log("Token stored:", token); // Log the token after storing
+          localStorage.setItem("token", token);
+          localStorage.setItem("idUser", idUser);
+          console.log("Token stored:", token);
           navigate("/dashboard");
-          onLogin(); // Proceed to GroupDashboardComponent
+          onLogin();
         } else {
           console.error("Token is undefined:", token);
           setError("Token not received. Please try again.");
         }
       } else {
-        setError(data.message || "Login error");
+        setError(response.data.message || "Login error");
       }
     } catch (error) {
       console.error("Error during login:", error);
